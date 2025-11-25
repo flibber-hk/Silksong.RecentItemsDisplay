@@ -1,10 +1,14 @@
 ﻿using BepInEx.Logging;
 using System;
+using Logger = BepInEx.Logging.Logger;
+
 
 namespace RecentItemsDisplay;
 
 internal static class VanillaItems
 {
+    private static readonly ManualLogSource Log = Logger.CreateLogSource($"{nameof(RecentItemsDisplay)}.{nameof(VanillaItems)}");
+
     public static void Hook()
     {
         // Most relevant SavedItem subclasses implement their own collect method
@@ -24,13 +28,31 @@ internal static class VanillaItems
         Md.CollectableItem.Collect.Prefix(OnCollectCollectableItem);
         Md.CollectableRelic.Get.Prefix(OnCollectCollectableRelic);
         // EnemyJournalRecord.Get.Prefix(...); - TODO
-        // FakeCollectible - should check subclasses, maybe
+        // FakeCollectible - all subclasses call base.Get
+        Md.FakeCollectable.Get.Prefix(GetFakeCollectable);
         // JournalQuestTarget - ???
         // QuestTarget* - ???
         // ToolItemBase has two subclasses
         Md.ToolItem.Unlock.Prefix(OnCollectToolItem);
         Md.ToolCrest.Unlock.Prefix(OnCollectToolCrest);
+
+        // Special cases
+        // Shop items which don't have a saved item should be handled separately
+        Md.ShopItem.SetPurchased.Postfix(OnBuyShopItem);
     }
+
+    private static void GetFakeCollectable(FakeCollectable self, ref bool showPopup)
+    {
+        Display.AddItem(self.GetUIMsgSprite(), self.GetUIMsgName());
+    }
+
+    private static void OnBuyShopItem(ShopItem self, ref Action onComplete, ref int subItemIndex)
+    {
+        if (self.savedItem != null) return;
+
+        Display.AddItem(self.ItemSprite, self.DisplayName);
+    }
+
 
     private static void OnCollectCollectableRelic(CollectableRelic self, ref bool showPopup)
     {

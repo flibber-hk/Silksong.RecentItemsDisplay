@@ -3,6 +3,8 @@ using BepInEx;
 namespace RecentItemsDisplay;
 
 [BepInDependency("org.silksong-modding.i18n")]
+[BepInDependency("org.silksong-modding.fsmutil")]
+[BepInDependency("io.github.flibber-hk.canvasutil")]
 [BepInAutoPlugin(id: "io.github.flibber-hk.recentitemsdisplay")]
 public partial class RecentItemsDisplayPlugin : BaseUnityPlugin
 {

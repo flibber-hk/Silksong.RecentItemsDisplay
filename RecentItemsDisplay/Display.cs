@@ -1,15 +1,19 @@
-﻿using MonoDetour.Reflection.Unspeakable;
+﻿using BepInEx.Logging;
+using MonoDetour.Reflection.Unspeakable;
 using System.Collections.Generic;
 using TeamCherry.Localization;
 using UnityEngine;
 using UnityEngine.UI;
 using CUtil = CanvasUtil.CanvasUtil;
+using Logger = BepInEx.Logging.Logger;
 using UObject = UnityEngine.Object;
 
 namespace RecentItemsDisplay;
 
 internal static class Display
 {
+    private static readonly ManualLogSource Log = Logger.CreateLogSource($"{nameof(RecentItemsDisplay)}.{nameof(Display)}");
+
     // TODO - make this configurable
     public static int MaxItems { get; internal set; } = 5;
 

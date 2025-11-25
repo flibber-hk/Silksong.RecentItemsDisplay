@@ -70,6 +70,17 @@
           "UnityEngine.Modules": "6000.0.50"
         }
       },
+      "Silksong.FsmUtil": {
+        "type": "Direct",
+        "requested": "[0.3.1, )",
+        "resolved": "0.3.1",
+        "contentHash": "KwI99jiBAnadeUJuA3CUUwNVhCPZwjccHP0IWoSTaMxcEmqDECbu42ISbtfX/3JdyLN374rCK55sRoaijgzd/g==",
+        "dependencies": {
+          "BepInEx.Core": "5.4.21",
+          "Silksong.GameLibs": "1.1.0-silksong1.0.28714",
+          "UnityEngine.Modules": "6000.0.50"
+        }
+      },
       "Silksong.GameLibs": {
         "type": "Direct",
         "requested": "[*-*, )",
