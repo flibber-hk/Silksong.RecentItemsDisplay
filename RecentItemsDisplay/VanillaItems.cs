@@ -32,13 +32,15 @@ internal static class VanillaItems
         Md.FakeCollectable.Get.Prefix(GetFakeCollectable);
         // JournalQuestTarget - ???
         // QuestTarget* - ???
-        // ToolItemBase has two subclasses
+        // ToolItemBase has two direct subclasses
         Md.ToolItem.Unlock.Prefix(OnCollectToolItem);
         Md.ToolCrest.Unlock.Prefix(OnCollectToolCrest);
 
         // Special cases
         // Shop items which don't have a saved item should be handled separately
         Md.ShopItem.SetPurchased.Postfix(OnBuyShopItem);
+        // Mask Shards, Spool Pieces
+        // Silk skills (see GlobalEnums.WeaverSpireAbility and the associated FSMs)
     }
 
     private static void GetFakeCollectable(FakeCollectable self, ref bool showPopup)
