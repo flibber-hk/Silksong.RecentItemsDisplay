@@ -41,6 +41,7 @@
   <ItemGroup>
     <PackageReference Include="Silksong.CanvasUtil" Version="1.0.0" />
     <PackageReference Include="Silksong.FsmUtil" Version="0.3.1" />
+    <PackageReference Include="Silksong.UnityHelper" Version="1.0.1" />
     <PackageReference Include="MonoDetour.HookGen" Version="0.7.*" PrivateAssets="all" />
     <PackageReference Include="MonoDetour" Version="*" />
   </ItemGroup>

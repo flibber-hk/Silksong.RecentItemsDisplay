@@ -1,5 +1,12 @@
 ﻿using BepInEx.Logging;
+using HutongGames.PlayMaker;
+using HutongGames.PlayMaker.Actions;
+using Silksong.FsmUtil;
 using System;
+using System.Linq;
+using TeamCherry.Localization;
+using UnityEngine;
+using Silksong.UnityHelper.Extensions;
 using Logger = BepInEx.Logging.Logger;
 
 
@@ -37,10 +44,75 @@ internal static class VanillaItems
         Md.ToolCrest.Unlock.Prefix(OnCollectToolCrest);
 
         // Special cases
-        // Shop items which don't have a saved item should be handled separately
+        // Shop items which don't have a saved item can be handled separately
         Md.ShopItem.SetPurchased.Postfix(OnBuyShopItem);
-        // Mask Shards, Spool Pieces
+        // Items which directly modify PlayerData via an FSM
+        Md.PlayMakerFSM.Start.Prefix(WatchSpoolsAndMaskShards);
+        Md.PlayMakerFSM.Start.Prefix(WatchSilkHearts);
         // Silk skills (see GlobalEnums.WeaverSpireAbility and the associated FSMs)
+        // Double Jump, Umbrella
+        // Eva
+    }
+
+    private static void WatchSilkHearts(PlayMakerFSM self)
+    {
+        // There is technically a SavedItemTrackerMarker but that is on the outer scene, not the memory scene
+        // which is where the item is given from
+
+        if (!self.gameObject.name.StartsWith("Memory Control") || self.FsmName != "Memory Control")
+        {
+            return;
+        }
+
+        FsmState? state = self.GetState("End Scene");
+        if (state == null) { return; }
+
+        foreach (RunFSM runFsm in state.Actions.OfType<RunFSM>())
+        {            
+            if (runFsm.fsmTemplateControl.fsmTemplate.name == "memory_scene_control_pre_end_silkheart")
+            {
+                // Get the sprite
+                GameObject? spriteOwner = self.gameObject.scene.FindGameObject("GameObject/silk_cocoon_core/heart/heart_core_beat");
+                if (spriteOwner == null)
+                {
+                    Log.LogError($"Unable to locate heart core in scene {self.gameObject.scene.name}");
+                    return;
+                }
+
+                Sprite sprite = spriteOwner.GetComponent<SpriteRenderer>().sprite;
+
+                // Technically this should be done on the template FSM, but I think this is fine
+                state.InsertMethod(0, a => { Display.AddItem(sprite, Language.Get("MEMORY_MSG_TITLE_SILKHEART", "Prompts")); });
+            }
+
+        }
+    }
+
+    private static void CheckTrackerMarker(PlayMakerFSM self, string fsmName, string goPrefix, string stateName, string langKey, string sheet = "UI")
+    {
+        if (self.FsmName != fsmName || !self.gameObject.name.StartsWith(goPrefix)) return;
+
+        FsmState? state = self.GetState(stateName);
+        if (state == null)
+        {
+            Log.LogInfo($"No state {stateName} on fsm {self.FsmName} on {self.gameObject.name}");
+            return;
+        }
+
+        state.InsertMethod(0, a =>
+        {
+            PlayMakerFSM fsm = a.Fsm.FsmComponent;
+            SavedItemTrackerMarker sitm = fsm.gameObject.GetComponent<SavedItemTrackerMarker>();
+            // The name on the saved item is not set so we look it up in Language
+            string name = Language.Get(langKey, sheet);
+            Display.AddItem(sitm.items[0].GetPopupIcon(), name);
+        });
+    }
+
+    private static void WatchSpoolsAndMaskShards(PlayMakerFSM self)
+    {
+        CheckTrackerMarker(self, "Heart Container Control", "Heart Piece", "Save Collected", "INV_NAME_HEART_PIECE_1");
+        CheckTrackerMarker(self, "Control", "Silk Spool", "Save", "INV_NAME_SPOOL_PIECE_HALF");
     }
 
     private static void GetFakeCollectable(FakeCollectable self, ref bool showPopup)
