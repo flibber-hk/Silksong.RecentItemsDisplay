@@ -17,6 +17,7 @@ namespace RecentItemsDisplay;
 internal static class VanillaItems
 {
     private static readonly MonoDetourManager mgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)}");
+    private static readonly MonoDetourManager fsmMgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)} :: FSM");
     private static readonly ManualLogSource Log = Logger.CreateLogSource($"{nameof(RecentItemsDisplay)}.{nameof(VanillaItems)}");
 
     public static void Hook()
@@ -50,7 +51,7 @@ internal static class VanillaItems
         // Shop items which don't have a saved item can be handled separately
         Md.ShopItem.SetPurchased.Postfix(OnBuyShopItem, manager: mgr);
         // Items which directly modify PlayerData via an FSM
-        Md.PlayMakerFSM.Start.Prefix(WatchFsms, manager: mgr);
+        Md.PlayMakerFSM.Start.Prefix(WatchFsms, manager: fsmMgr);
     }
 
     private static void WatchFsms(PlayMakerFSM self)
