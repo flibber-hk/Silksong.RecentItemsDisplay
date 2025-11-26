@@ -17,7 +17,7 @@ containsNsfwContent = false
 BepInEx-BepInExPack_Silksong = "5.4.2304"
 MonoDetour-MonoDetour_BepInEx_5 = "0.7.5"
 flibber-CanvasUtil = "1.0.0"
-silksong_modding-I18N = "0.1.0"
+silksong_modding-I18N = "1.0.2"
 silksong_modding-UnityHelper = "1.0.1"
 silksong_modding-FsmUtil = "0.3.2"
 
