@@ -17,3 +17,5 @@
 [assembly: MonoDetourTargets(typeof(FakeCollectable))]
 [assembly: MonoDetourTargets(typeof(ShopItem))]
 [assembly: MonoDetourTargets(typeof(PlayMakerFSM))]
+[assembly: MonoDetourTargets(typeof(PowerUpGetMsg))]
+[assembly: MonoDetourTargets(typeof(SkillGetMsg))]

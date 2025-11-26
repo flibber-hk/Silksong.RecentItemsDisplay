@@ -28,7 +28,7 @@ internal static class VanillaItems
         // So we have to manually hook several subclasses that define the relevant methods.
 
         // TODO - triage the remaining subclasses of SavedItem
-        // TODO - implement settings for omitting e.g. journal entries
+        // TODO - implement settings for showing (and omitting) e.g. journal entries
         
         // MateriumItem - an isolated direct subclass of SavedItem
         Md.MateriumItem.Get.Prefix(OnCollectMateriumItem, manager: mgr);
@@ -50,147 +50,54 @@ internal static class VanillaItems
         // Special cases
         // Shop items which don't have a saved item can be handled separately
         Md.ShopItem.SetPurchased.Postfix(OnBuyShopItem, manager: mgr);
+        // Watch the UI message for silk skills and powerups (ancestral arts)
+        Md.PowerUpGetMsg.Setup.Postfix(OnGetPowerUp, manager: mgr);
+        Md.SkillGetMsg.Setup.Postfix(OnGetSkill, manager: mgr);
+
         // Items which directly modify PlayerData via an FSM
         Md.PlayMakerFSM.Start.Prefix(WatchFsms, manager: fsmMgr);
+    }
+
+    private static bool NameMatches(this string self, string target)
+    {
+        if (target == self) return true;
+        if (!self.StartsWith(target)) return false;
+
+        string remainder = self.Substring(target.Length);
+        if (string.IsNullOrWhiteSpace(remainder)) return true;
+
+        return remainder.TrimStart().StartsWith("(");
+    }
+
+    private static void OnGetSkill(SkillGetMsg self, ref ToolItemSkill skill)
+    {
+        Display.AddItem(skill.GetUIMsgSprite(), skill.GetUIMsgName());
+    }
+
+    private static void OnGetPowerUp(PowerUpGetMsg self, ref PowerUpGetMsg.PowerUps skill)
+    {
+        Display.AddItem(self.solidSprite.sprite, self.nameText.text);
     }
 
     private static void WatchFsms(PlayMakerFSM self)
     {
         WatchSpoolsAndMaskShards(self);
         WatchSilkHearts(self);
-        // Weaver shrine FSM skills (seemingly covers silkspear, dash, silksphere, walljump, silkdash, harpoondash, superjump)
-        WatchWeaverShrines(self);
-        // Eva - Hunter2, Hunter3, VestiYellow, VestiBlue, Sylphsong
-        // Hunter2 and Hunter3 are handled by the ToolCrest
-        WatchEva(self);
-        // Needolin
-        WatchWidow(self);
-        // Rune Rage
-        WatchRuneRage(self);
-        // Cross Stitch
-        WatchPhantom(self);
-        // Pale Nails
-        WatchPaleNails(self);
+
+        // Vesticrest
+        WatchUpgradeFsm(self);
+
         // TODO - Double Jump, Glide, Needle Strike
-        // TODO - Beastling Call, Elegy of the Deep
-        // TODO - Journal
-        // TODO - Probably Everbloom
+        // TODO - Beastling Call, Elegy of the Deep, Citadel melodies
+        // TODO - Journal, Everbloom
         // TODO - Deduplicate courier stuff
     }
 
-    private static void AddSsgmWatcher(FsmState getState, int index)
+    private static void WatchUpgradeFsm(PlayMakerFSM self)
     {
-        getState.InsertMethod(index, static a =>
-        {
-            FsmState state = a.State;
+        if (!self.gameObject.name.NameMatches("UI Msg Crest Evolve") || self.FsmName != "Msg Control") return;
 
-            SpawnSkillGetMsg? ssgm = state.GetFirstActionOfType<SpawnSkillGetMsg>();
-            if (ssgm == null) return;
-
-            GameObject msgPrefab = ssgm.MsgPrefab.Value;
-            ToolItemSkill? skill = ssgm.Skill.Value as ToolItemSkill;
-            if (skill == null) return;
-
-            Display.AddItem(skill.GetUIMsgSprite(), skill.GetUIMsgName());
-        });
-
-    }
-
-    private static void WatchPaleNails(PlayMakerFSM self)
-    {
-        if (!self.gameObject.name.StartsWith("Silk Needle Spell Get") || self.FsmName != "Control")
-        {
-            return;
-        }
-
-        FsmState? state = self.GetState("Msg");
-        if (state == null) { return; }
-
-        AddSsgmWatcher(state, 0);
-    }
-
-    private static void WatchPhantom(PlayMakerFSM self)
-    {
-        if (!self.gameObject.name.StartsWith("Phantom") || self.FsmName != "Control")
-        {
-            return;
-        }
-
-        FsmState? state = self.GetState("UI Msg");
-        if (state == null) { return; }
-
-        AddSsgmWatcher(state, 1);
-    }
-
-    private static void WatchRuneRage(PlayMakerFSM self)
-    {
-        if (!self.gameObject.name.StartsWith("Memory Control") || self.FsmName != "Memory Control")
-        {
-            return;
-        }
-
-        FsmState? state = self.GetState("Get Rune Bomb");
-        if (state == null) { return; }
-
-        AddSsgmWatcher(state, 0);
-    }
-
-    private static void WatchWidow(PlayMakerFSM self)
-    {
-        if (!self.gameObject.name.StartsWith("Spinner Boss") || self.FsmName != "Control")
-        {
-            return;
-        }
-
-        // This isn't the state where they get needolin, that's a few states previously
-        if (self.GetState("Get Needolin") is not FsmState needolinState)
-        {
-            return;
-        }
-
-        needolinState.InsertMethod(0, static a =>
-        {
-            // Make Spugm state not dependent on give state
-            FsmState state = a.Fsm.GetState("Get Needolin");
-
-            SpawnPowerUpGetMsg? spugm = state.GetFirstActionOfType<SpawnPowerUpGetMsg>();
-            if (spugm == null) return;
-
-            GameObject msgPrefab = spugm.MsgPrefab.Value;
-            PowerUpGetMsg.PowerUps powerup = (PowerUpGetMsg.PowerUps)spugm.PowerUp.Value;
-
-            PowerUpGetMsg.PowerUpInfo powerupInfo = msgPrefab.GetComponent<PowerUpGetMsg>().powerUpInfos[(int)powerup];
-            Display.AddItem(powerupInfo.SolidSprite, powerupInfo.Name.ToString());
-        });
-    }
-
-    private static void WatchEva(PlayMakerFSM self)
-    {
-        if (!self.gameObject.name.StartsWith("Crest Upgrade Shrine") || self.FsmName != "Dialogue")
-        {
-            return;
-        }
-
-        // Sylphsong
-        if (self.GetState("Set Bound") is FsmState sylphState)
-        {
-            sylphState.InsertMethod(1, static a =>
-            {
-                FsmState state = a.State;
-
-                SpawnPowerUpGetMsg? spugm = state.GetFirstActionOfType<SpawnPowerUpGetMsg>();
-                if (spugm == null) return;
-
-                GameObject msgPrefab = spugm.MsgPrefab.Value;
-                PowerUpGetMsg.PowerUps powerup = (PowerUpGetMsg.PowerUps)spugm.PowerUp.Value;
-                
-                PowerUpGetMsg.PowerUpInfo powerupInfo = msgPrefab.GetComponent<PowerUpGetMsg>().powerUpInfos[(int)powerup];
-                Display.AddItem(powerupInfo.SolidSprite, powerupInfo.Name.ToString());
-            });
-        }
-
-        // Vesticrest
-        string[] stateNames = ["Unlock First Slot", "Unlock Other Slot"];
+        string[] stateNames = ["Set Socket 1", "Set Socket 2"];
         foreach (string stateName in stateNames)
         {
             if (self.GetState(stateName) is not FsmState unlockState)
@@ -198,65 +105,19 @@ internal static class VanillaItems
                 continue;
             }
 
-            // Just before/after the SetPlayerDataBool, but the position doesn't really matter
-            unlockState.InsertMethod(4, static a =>
+            unlockState.AddMethod(static a =>
             {
                 FsmState state = a.State;
+                SetGameObject? sgo = state.GetFirstActionOfType<SetGameObject>();
+                if (sgo == null) return;
 
-                CreateObject? co = state.GetFirstActionOfType<CreateObject>();
-                if (co == null) return;
-
-                // The same sprite seems to be used for both
-                GameObject prefab = co.gameObject.Value;
-                GameObject? crest = prefab.FindChild("Tool_Socket_Evolve_lvl1/Pivot/Crest");
+                GameObject? crest = sgo.gameObject.Value.FindChild("Pivot/Crest");
                 if (crest == null) return;
 
                 Sprite sprite = crest.GetComponent<SpriteRenderer>().sprite;
                 Display.AddItem(sprite, Language.Get("UI_MSG_TITLE_EXTRASLOT_NAME", "Tools"));
             });
         }
-        
-    }
-
-    private static void WatchWeaverShrines(PlayMakerFSM self)
-    {
-        if (self.FsmName != "Inspection")
-        {
-            return;
-        }
-        if (!self.gameObject.name.StartsWith("Shrine Weaver Ability")
-            // I don't believe this one is used but it makes sense to include
-            && !self.gameObject.name.StartsWith("Shrine First Weaver NPC"))
-        {
-            return;
-        }
-
-        FsmState? end = self.GetState("End");
-        if (end == null) return;
-
-        end.InsertMethod(0, static a =>
-        {
-            Fsm fsm = a.fsm;
-            // First, check if it's a tool
-            FsmObject? obj = fsm.GetFsmObject("Skill Item");
-            if (obj != null && obj.Value is SavedItem item)
-            {
-                Display.AddItem(item.GetPopupIcon(), item.GetPopupName());
-                return;
-            }
-
-            // Otherwise, check if it's a powerup
-            PowerUpGetMsg.PowerUps powerup = (PowerUpGetMsg.PowerUps)fsm.GetFsmEnum("Powerup").Value;
-
-            FsmState powerupState = fsm.GetState("Powerup Msg");
-            GameObject? msgPrefab = powerupState.GetFirstActionOfType<SpawnPowerUpGetMsg>()?.MsgPrefab.Value;
-            if (msgPrefab != null)
-            {
-                PowerUpGetMsg.PowerUpInfo powerupInfo = msgPrefab.GetComponent<PowerUpGetMsg>().powerUpInfos[(int)powerup];
-                Display.AddItem(powerupInfo.SolidSprite, powerupInfo.Name.ToString());
-                return;
-            }
-        });
     }
 
     private static void WatchSilkHearts(PlayMakerFSM self)
@@ -264,7 +125,7 @@ internal static class VanillaItems
         // There is technically a SavedItemTrackerMarker but that is on the outer scene, not the memory scene
         // which is where the item is given from
 
-        if (!self.gameObject.name.StartsWith("Memory Control") || self.FsmName != "Memory Control")
+        if (!self.gameObject.name.NameMatches("Memory Control") || self.FsmName != "Memory Control")
         {
             return;
         }
@@ -295,7 +156,7 @@ internal static class VanillaItems
 
     private static void CheckTrackerMarker(PlayMakerFSM self, string fsmName, string goPrefix, string stateName, string langKey, string sheet = "UI")
     {
-        if (self.FsmName != fsmName || !self.gameObject.name.StartsWith(goPrefix)) return;
+        if (self.FsmName != fsmName || !self.gameObject.name.NameMatches(goPrefix)) return;
 
         FsmState? state = self.GetState(stateName);
         if (state == null)
