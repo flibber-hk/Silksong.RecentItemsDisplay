@@ -16,6 +16,9 @@ namespace RecentItemsDisplay;
 
 internal static class VanillaItems
 {
+    // Separate method for forward-compatibility
+    private static void SendToDisplay(Sprite sprite, string text) => Display.AddItem(sprite, text);
+
     private static readonly MonoDetourManager mgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)}");
     private static readonly MonoDetourManager fsmMgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)} :: FSM");
     private static readonly ManualLogSource Log = Logger.CreateLogSource($"{nameof(RecentItemsDisplay)}.{nameof(VanillaItems)}");
@@ -71,12 +74,12 @@ internal static class VanillaItems
 
     private static void OnGetSkill(SkillGetMsg self, ref ToolItemSkill skill)
     {
-        Display.AddItem(skill.GetUIMsgSprite(), skill.GetUIMsgName());
+        SendToDisplay(skill.GetUIMsgSprite(), skill.GetUIMsgName());
     }
 
     private static void OnGetPowerUp(PowerUpGetMsg self, ref PowerUpGetMsg.PowerUps skill)
     {
-        Display.AddItem(self.solidSprite.sprite, self.nameText.text);
+        SendToDisplay(self.solidSprite.sprite, self.nameText.text);
     }
 
     private static void WatchFsms(PlayMakerFSM self)
@@ -87,10 +90,96 @@ internal static class VanillaItems
         // Vesticrest
         WatchUpgradeFsm(self);
 
-        // TODO - Double Jump, Glide, Needle Strike
-        // TODO - Beastling Call, Elegy of the Deep, Citadel melodies
-        // TODO - Journal, Everbloom
+        // Citadel melodies
+        WatchMelodyFsm(self);
+
+        // Other abilities
+        WatchGeneralGetFsm(self);
+
         // TODO - Deduplicate courier stuff
+    }
+
+    private static void WatchGeneralGetFsm(PlayMakerFSM self)
+    {
+        // Materium, Farsight represent building the item, I think I'll keep them
+        // Silk skills, Ancestral Arts seem to be ignored
+        // Silk Heart and Hunter Upgrades should be excluded
+
+        if (!self.gameObject.name.NameMatches("UI Msg Get Item") || self.FsmName != "Msg Control") return;
+
+        if (self.GetState("Stop Up") is not FsmState giveState) return;
+
+        giveState.InsertMethod(0, static a =>
+        {
+            string check = a.Fsm.GetFsmString("Item").Value;
+
+            if (check == "SilkHeart" || check.StartsWith("Hunter Combo"))
+            {
+                return;
+            }
+            
+            GameObject go = a.Fsm.FsmComponent.gameObject;
+
+            GameObject? icon = go.FindChild("Icon");
+            if (icon == null) return;
+
+            GameObject? itemName = go.FindChild("Item Name");
+            if (itemName == null) return;
+
+            Sprite sprite = icon.GetComponent<SpriteRenderer>().sprite;
+
+            string text;
+            if (itemName.TryGetComponent<TMProOld.TextMeshPro>(out TMProOld.TextMeshPro oldTmpro))
+            {
+                text = oldTmpro.text;
+            }
+            else if (itemName.TryGetComponent<TMPro.TextMeshPro>(out TMPro.TextMeshPro newTmpro))
+            {
+                text = newTmpro.text;
+            }
+            else
+            {
+                return;
+            }
+
+            SendToDisplay(sprite, text);
+        });
+    }
+
+    private static void WatchMelodyFsm(PlayMakerFSM self)
+    {
+        if (!self.gameObject.name.NameMatches("UI Msg Get Item Melody") || self.FsmName != "Msg Control") return;
+
+        if (self.GetState("Stop Up") is not FsmState giveState) return;
+
+        giveState.InsertMethod(0, static a =>
+        {
+            GameObject go = a.Fsm.FsmComponent.gameObject;
+
+            GameObject? icon = go.FindChild("Contents/Icon");
+            if (icon == null) return;
+
+            GameObject? itemName = go.FindChild("Contents/Item Name");
+            if (itemName == null) return;
+
+            Sprite sprite = icon.GetComponent<SpriteRenderer>().sprite;
+
+            string text;
+            if (itemName.TryGetComponent<TMProOld.TextMeshPro>(out TMProOld.TextMeshPro oldTmpro))
+            {
+                text = oldTmpro.text;
+            }
+            else if (itemName.TryGetComponent<TMPro.TextMeshPro>(out TMPro.TextMeshPro newTmpro))
+            {
+                text = newTmpro.text;
+            }
+            else
+            {
+                return;
+            }
+
+            SendToDisplay(sprite, text);
+        });
     }
 
     private static void WatchUpgradeFsm(PlayMakerFSM self)
@@ -115,7 +204,7 @@ internal static class VanillaItems
                 if (crest == null) return;
 
                 Sprite sprite = crest.GetComponent<SpriteRenderer>().sprite;
-                Display.AddItem(sprite, Language.Get("UI_MSG_TITLE_EXTRASLOT_NAME", "Tools"));
+                SendToDisplay(sprite, Language.Get("UI_MSG_TITLE_EXTRASLOT_NAME", "Tools"));
             });
         }
     }
@@ -148,7 +237,7 @@ internal static class VanillaItems
                 Sprite sprite = spriteOwner.GetComponent<SpriteRenderer>().sprite;
 
                 // Technically this should be done on the template FSM, but I think this is fine
-                state.InsertMethod(1, a => { Display.AddItem(sprite, Language.Get("MEMORY_MSG_TITLE_SILKHEART", "Prompts")); });
+                state.InsertMethod(1, a => { SendToDisplay(sprite, Language.Get("MEMORY_MSG_TITLE_SILKHEART", "Prompts")); });
             }
 
         }
@@ -171,7 +260,7 @@ internal static class VanillaItems
             SavedItemTrackerMarker sitm = fsm.gameObject.GetComponent<SavedItemTrackerMarker>();
             // The name on the saved item is not set so we look it up in Language
             string name = Language.Get(langKey, sheet);
-            Display.AddItem(sitm.items[0].GetPopupIcon(), name);
+            SendToDisplay(sitm.items[0].GetPopupIcon(), name);
         });
     }
 
@@ -183,41 +272,49 @@ internal static class VanillaItems
 
     private static void GetFakeCollectable(FakeCollectable self, ref bool showPopup)
     {
-        Display.AddItem(self.GetUIMsgSprite(), self.GetUIMsgName());
+        SendToDisplay(self.GetUIMsgSprite(), self.GetUIMsgName());
     }
 
     private static void OnBuyShopItem(ShopItem self, ref Action onComplete, ref int subItemIndex)
     {
         if (self.savedItem != null) return;
 
-        Display.AddItem(self.ItemSprite, self.DisplayName);
+        SendToDisplay(self.ItemSprite, self.DisplayName);
     }
 
 
     private static void OnCollectCollectableRelic(CollectableRelic self, ref bool showPopup)
     {
-        Display.AddItem(self.GetUIMsgSprite(), self.GetUIMsgName());
+        SendToDisplay(self.GetUIMsgSprite(), self.GetUIMsgName());
     }
 
     private static void OnCollectMateriumItem(MateriumItem self, ref bool showPopup)
     {
-        Display.AddItem(self.GetPopupIcon(), self.GetPopupName());
+        SendToDisplay(self.GetPopupIcon(), self.GetPopupName());
     }
 
     private static void OnCollectToolCrest(ToolCrest self)
     {
         // bool showPopup = ???, probably false
-        Display.AddItem(self.GetUIMsgSprite(), self.displayName.ToString());
+        SendToDisplay(self.GetUIMsgSprite(), self.displayName.ToString());
     }
 
     private static void OnCollectToolItem(ToolItem self, ref Action afterTutorialMsg, ref ToolItem.PopupFlags popupFlags)
     {
         // bool showPopup = popupFlags != ToolItem.PopupFlags.None;
-        Display.AddItem(self.GetUIMsgSprite(), self.GetUIMsgName());
+        SendToDisplay(self.GetUIMsgSprite(), self.GetUIMsgName());
     }
 
     private static void OnCollectCollectableItem(CollectableItem self, ref int amount, ref bool showPopup)
     {
-        Display.AddItem(self.GetUIMsgSprite(), self.GetUIMsgName());
+        if (self is DeliveryQuestItem dqi)
+        {
+            // When getting a delivery quest item, you get multiple at once
+            // for each break that's allowed.
+            // It makes sense to only show one in RecentItems
+            if (dqi.CollectedAmount > 0) return;
+        }
+
+        SendToDisplay(self.GetUIMsgSprite(), self.GetUIMsgName());
     }
 }
