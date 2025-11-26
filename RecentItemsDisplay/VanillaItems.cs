@@ -64,13 +64,74 @@ internal static class VanillaItems
         WatchEva(self);
         // Needolin
         WatchWidow(self);
-
-        // TODO - Rune Rage, Cross Stitch, Pale Nails
+        // Rune Rage
+        WatchRuneRage(self);
+        // Cross Stitch
+        WatchPhantom(self);
+        // Pale Nails
+        WatchPaleNails(self);
         // TODO - Double Jump, Glide, Needle Strike
         // TODO - Beastling Call, Elegy of the Deep
         // TODO - Journal
         // TODO - Probably Everbloom
         // TODO - Deduplicate courier stuff
+    }
+
+    private static void AddSsgmWatcher(FsmState getState, int index)
+    {
+        getState.InsertMethod(index, static a =>
+        {
+            FsmState state = a.State;
+
+            SpawnSkillGetMsg? ssgm = state.GetFirstActionOfType<SpawnSkillGetMsg>();
+            if (ssgm == null) return;
+
+            GameObject msgPrefab = ssgm.MsgPrefab.Value;
+            ToolItemSkill? skill = ssgm.Skill.Value as ToolItemSkill;
+            if (skill == null) return;
+
+            Display.AddItem(skill.GetUIMsgSprite(), skill.GetUIMsgName());
+        });
+
+    }
+
+    private static void WatchPaleNails(PlayMakerFSM self)
+    {
+        if (!self.gameObject.name.StartsWith("Silk Needle Spell Get") || self.FsmName != "Control")
+        {
+            return;
+        }
+
+        FsmState? state = self.GetState("Msg");
+        if (state == null) { return; }
+
+        AddSsgmWatcher(state, 0);
+    }
+
+    private static void WatchPhantom(PlayMakerFSM self)
+    {
+        if (!self.gameObject.name.StartsWith("Phantom") || self.FsmName != "Control")
+        {
+            return;
+        }
+
+        FsmState? state = self.GetState("UI Msg");
+        if (state == null) { return; }
+
+        AddSsgmWatcher(state, 1);
+    }
+
+    private static void WatchRuneRage(PlayMakerFSM self)
+    {
+        if (!self.gameObject.name.StartsWith("Memory Control") || self.FsmName != "Memory Control")
+        {
+            return;
+        }
+
+        FsmState? state = self.GetState("Get Rune Bomb");
+        if (state == null) { return; }
+
+        AddSsgmWatcher(state, 0);
     }
 
     private static void WatchWidow(PlayMakerFSM self)
@@ -158,35 +219,43 @@ internal static class VanillaItems
 
     private static void WatchWeaverShrines(PlayMakerFSM self)
     {
-        if (self.gameObject.name.StartsWith("Shrine Weaver Ability") && self.FsmName == "Inspection")
+        if (self.FsmName != "Inspection")
         {
-            FsmState? end = self.GetState("End");
-            if (end == null) return;
-
-            end.InsertMethod(0, static a =>
-            {
-                Fsm fsm = a.fsm;
-                // First, check if it's a tool
-                FsmObject? obj = fsm.GetFsmObject("Skill Item");
-                if (obj != null && obj.Value is SavedItem item)
-                {
-                    Display.AddItem(item.GetPopupIcon(), item.GetPopupName());
-                    return;
-                }
-
-                // Otherwise, check if it's a powerup
-                PowerUpGetMsg.PowerUps powerup = (PowerUpGetMsg.PowerUps)fsm.GetFsmEnum("Powerup").Value;
-
-                FsmState powerupState = fsm.GetState("Powerup Msg");
-                GameObject? msgPrefab = powerupState.GetFirstActionOfType<SpawnPowerUpGetMsg>()?.MsgPrefab.Value;
-                if (msgPrefab != null)
-                {
-                    PowerUpGetMsg.PowerUpInfo powerupInfo = msgPrefab.GetComponent<PowerUpGetMsg>().powerUpInfos[(int)powerup];
-                    Display.AddItem(powerupInfo.SolidSprite, powerupInfo.Name.ToString());
-                    return;
-                }
-            });
+            return;
         }
+        if (!self.gameObject.name.StartsWith("Shrine Weaver Ability")
+            // I don't believe this one is used but it makes sense to include
+            && !self.gameObject.name.StartsWith("Shrine First Weaver NPC"))
+        {
+            return;
+        }
+
+        FsmState? end = self.GetState("End");
+        if (end == null) return;
+
+        end.InsertMethod(0, static a =>
+        {
+            Fsm fsm = a.fsm;
+            // First, check if it's a tool
+            FsmObject? obj = fsm.GetFsmObject("Skill Item");
+            if (obj != null && obj.Value is SavedItem item)
+            {
+                Display.AddItem(item.GetPopupIcon(), item.GetPopupName());
+                return;
+            }
+
+            // Otherwise, check if it's a powerup
+            PowerUpGetMsg.PowerUps powerup = (PowerUpGetMsg.PowerUps)fsm.GetFsmEnum("Powerup").Value;
+
+            FsmState powerupState = fsm.GetState("Powerup Msg");
+            GameObject? msgPrefab = powerupState.GetFirstActionOfType<SpawnPowerUpGetMsg>()?.MsgPrefab.Value;
+            if (msgPrefab != null)
+            {
+                PowerUpGetMsg.PowerUpInfo powerupInfo = msgPrefab.GetComponent<PowerUpGetMsg>().powerUpInfos[(int)powerup];
+                Display.AddItem(powerupInfo.SolidSprite, powerupInfo.Name.ToString());
+                return;
+            }
+        });
     }
 
     private static void WatchSilkHearts(PlayMakerFSM self)
