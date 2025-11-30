@@ -8,8 +8,8 @@ using System;
 using System.Linq;
 using TeamCherry.Localization;
 using UnityEngine;
+using RecentItemsDisplay.Serialization;
 using Logger = BepInEx.Logging.Logger;
-using UObject = UnityEngine.Object;
 
 
 namespace RecentItemsDisplay;
@@ -17,7 +17,7 @@ namespace RecentItemsDisplay;
 internal static class VanillaItems
 {
     // Separate method for forward-compatibility
-    private static void SendToDisplay(Sprite sprite, string text) => Display.AddItem(sprite, text);
+    private static void SendToDisplay(ISpriteProvider sprite, string text) => Display.AddItem(sprite.GetSprite(), text);
 
     private static readonly MonoDetourManager mgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)}");
     private static readonly MonoDetourManager fsmMgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)} :: FSM");
@@ -74,12 +74,16 @@ internal static class VanillaItems
 
     private static void OnGetSkill(SkillGetMsg self, ref ToolItemSkill skill)
     {
-        SendToDisplay(skill.GetUIMsgSprite(), skill.GetUIMsgName());
+        SendToDisplay(
+            new ToolItemSprite(skill.name),
+            skill.GetUIMsgName());
     }
 
     private static void OnGetPowerUp(PowerUpGetMsg self, ref PowerUpGetMsg.PowerUps skill)
     {
-        SendToDisplay(self.solidSprite.sprite, self.nameText.text);
+        SendToDisplay(
+            new NonSerializableSprite() { RuntimeSprite = self.solidSprite.sprite },
+            self.nameText.text);
     }
 
     private static void WatchFsms(PlayMakerFSM self)
@@ -142,7 +146,7 @@ internal static class VanillaItems
                 return;
             }
 
-            SendToDisplay(sprite, text);
+            SendToDisplay(new NonSerializableSprite() { RuntimeSprite = sprite }, text);
         });
     }
 
@@ -178,7 +182,7 @@ internal static class VanillaItems
                 return;
             }
 
-            SendToDisplay(sprite, text);
+            SendToDisplay(new NonSerializableSprite() { RuntimeSprite = sprite }, text);
         });
     }
 
@@ -204,7 +208,7 @@ internal static class VanillaItems
                 if (crest == null) return;
 
                 Sprite sprite = crest.GetComponent<SpriteRenderer>().sprite;
-                SendToDisplay(sprite, Language.Get("UI_MSG_TITLE_EXTRASLOT_NAME", "Tools"));
+                SendToDisplay(new NonSerializableSprite() { RuntimeSprite = sprite }, Language.Get("UI_MSG_TITLE_EXTRASLOT_NAME", "Tools"));
             });
         }
     }
@@ -237,7 +241,10 @@ internal static class VanillaItems
                 Sprite sprite = spriteOwner.GetComponent<SpriteRenderer>().sprite;
 
                 // Technically this should be done on the template FSM, but I think this is fine
-                state.InsertMethod(1, a => { SendToDisplay(sprite, Language.Get("MEMORY_MSG_TITLE_SILKHEART", "Prompts")); });
+                state.InsertMethod(1, a => 
+                { 
+                    SendToDisplay(new NonSerializableSprite { RuntimeSprite = sprite }, Language.Get("MEMORY_MSG_TITLE_SILKHEART", "Prompts")); 
+                });
             }
 
         }
@@ -260,7 +267,9 @@ internal static class VanillaItems
             SavedItemTrackerMarker sitm = fsm.gameObject.GetComponent<SavedItemTrackerMarker>();
             // The name on the saved item is not set so we look it up in Language
             string name = Language.Get(langKey, sheet);
-            SendToDisplay(sitm.items[0].GetPopupIcon(), name);
+            SendToDisplay(
+                new NonSerializableSprite() { RuntimeSprite = sitm.items[0].GetPopupIcon() },
+                name);
         });
     }
 
@@ -272,37 +281,41 @@ internal static class VanillaItems
 
     private static void GetFakeCollectable(FakeCollectable self, ref bool showPopup)
     {
-        SendToDisplay(self.GetUIMsgSprite(), self.GetUIMsgName());
+        SendToDisplay(
+            new NonSerializableSprite() { RuntimeSprite = self.GetUIMsgSprite() },
+            self.GetUIMsgName());
     }
 
     private static void OnBuyShopItem(ShopItem self, ref Action onComplete, ref int subItemIndex)
     {
         if (self.savedItem != null) return;
 
-        SendToDisplay(self.ItemSprite, self.DisplayName);
+        SendToDisplay(
+            new NonSerializableSprite() { RuntimeSprite = self.ItemSprite },
+            self.DisplayName);
     }
 
 
     private static void OnCollectCollectableRelic(CollectableRelic self, ref bool showPopup)
     {
-        SendToDisplay(self.GetUIMsgSprite(), self.GetUIMsgName());
+        SendToDisplay(new CollectableRelicSprite(self.name), self.GetUIMsgName());
     }
 
     private static void OnCollectMateriumItem(MateriumItem self, ref bool showPopup)
     {
-        SendToDisplay(self.GetPopupIcon(), self.GetPopupName());
+        SendToDisplay(new MateriumSprite(self.name), self.GetPopupName());
     }
 
     private static void OnCollectToolCrest(ToolCrest self)
     {
         // bool showPopup = ???, probably false
-        SendToDisplay(self.GetUIMsgSprite(), self.displayName.ToString());
+        SendToDisplay(new ToolCrestSprite(self.name), self.displayName.ToString());
     }
 
     private static void OnCollectToolItem(ToolItem self, ref Action afterTutorialMsg, ref ToolItem.PopupFlags popupFlags)
     {
         // bool showPopup = popupFlags != ToolItem.PopupFlags.None;
-        SendToDisplay(self.GetUIMsgSprite(), self.GetUIMsgName());
+        SendToDisplay(new ToolItemSprite(self.name), self.GetUIMsgName());
     }
 
     private static void OnCollectCollectableItem(CollectableItem self, ref int amount, ref bool showPopup)
@@ -315,6 +328,6 @@ internal static class VanillaItems
             if (dqi.CollectedAmount > 0) return;
         }
 
-        SendToDisplay(self.GetUIMsgSprite(), self.GetUIMsgName());
+        SendToDisplay(new CollectableItemSprite(self.name), self.GetUIMsgName());
     }
 }
