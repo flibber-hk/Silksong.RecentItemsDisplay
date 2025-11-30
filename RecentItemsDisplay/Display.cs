@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using MonoDetour.Reflection.Unspeakable;
 using System.Collections.Generic;
+using System.Linq;
 using TeamCherry.Localization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,30 +15,33 @@ internal static class Display
 {
     private static readonly ManualLogSource Log = Logger.CreateLogSource($"{nameof(RecentItemsDisplay)}.{nameof(Display)}");
 
-    // TODO - make this configurable
-    public static int MaxItems { get; internal set; } = 5;
-
-    private static readonly Queue<GameObject> items = new();
-
-    private static GameObject? canvas;
-
-    // TODO - make this configurable
+    // TODO - send items from save data
+    // TODO - make these configurable
+    public static int NumDisplayableItems { get; internal set; } = 5;
     private static readonly Vector2 AnchorPoint = new(0.9f, 0.9f);
+
+    public static int MaxItems { get; internal set; } = 10;
+
+    private static GameObject? _canvas;
+    private static GameObject? _title;
+    private static readonly Queue<GameObject> _items = new();
+    
+
 
     public static void Create()
     {
-        if (canvas != null) return;
+        if (_canvas != null) return;
         // Create base canvas
-        canvas = CUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
+        _canvas = CUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
 
-        CanvasGroup canvasGroup = canvas.GetComponent<CanvasGroup>();
+        CanvasGroup canvasGroup = _canvas.GetComponent<CanvasGroup>();
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
 
-        UObject.DontDestroyOnLoad(canvas);
+        UObject.DontDestroyOnLoad(_canvas);
 
-        CUtil.CreateTextPanel(
-            canvas,
+        _title = CUtil.CreateTextPanel(
+            _canvas,
             Language.Get("RECENT_ITEMS_TITLE", $"Mods.{RecentItemsDisplayPlugin.Id}"),
             24,
             TextAnchor.MiddleCenter,
@@ -48,32 +52,33 @@ internal static class Display
                 )
             );
 
+        UpdateVisibility();
         Show();
     }
 
     public static void Destroy()
     {
-        if (canvas != null) UObject.Destroy(canvas);
-        canvas = null;
+        if (_canvas != null) UObject.Destroy(_canvas);
+        _canvas = null;
 
-        items.Clear();
+        _items.Clear();
     }
 
     public static void Redraw()
     {
         Destroy();
         Create();
-        // TODO - send items from save data
+        UpdateVisibility();
     }
 
     internal static void AddItem(Sprite? sprite, string msg, Color? textColor = null)
     {
-        if (canvas == null)
+        if (_canvas == null)
         {
             Create();
         }
 
-        GameObject basePanel = CUtil.CreateBasePanel(canvas!,
+        GameObject basePanel = CUtil.CreateBasePanel(_canvas!,
             new CanvasUtil.RectData(new Vector2(200, 50), Vector2.zero,
             AnchorPoint, AnchorPoint));
 
@@ -93,19 +98,20 @@ internal static class Display
             textPanel.GetComponent<Text>().color = textColor.Value;
         }
         
-        items.Enqueue(basePanel);
-        if (items.Count > MaxItems)
+        _items.Enqueue(basePanel);
+        if (_items.Count > MaxItems)
         {
-            UObject.Destroy(items.Dequeue());
+            UObject.Destroy(_items.Dequeue());
         }
 
         UpdatePositions();
+        UpdateVisibility();
     }
 
     private static void UpdatePositions()
     {
-        int i = items.Count - 1;
-        foreach (GameObject item in items)
+        int i = _items.Count - 1;
+        foreach (GameObject item in _items)
         {
             Vector2 newPos = AnchorPoint + new Vector2(0, -0.06f * i--);
             item.GetComponent<RectTransform>().anchorMin = newPos;
@@ -113,17 +119,29 @@ internal static class Display
             item.SetActive(i < MaxItems - 1);
         }
     }
+    private static void UpdateVisibility()
+    {
+        foreach ((GameObject item, int index) in _items.Reverse().Select((go, idx) => (go, idx)))
+        {
+            item.SetActive(index < NumDisplayableItems);
+        }
+
+        if (_title != null)
+        {
+            _title.SetActive(_items.Count > 0);
+        }
+    }
 
     public static void Show()
     {
-        if (canvas == null) return;
-        canvas.SetActive(true);
+        if (_canvas == null) return;
+        _canvas.SetActive(true);
     }
 
     public static void Hide()
     {
-        if (canvas == null) return;
-        canvas.SetActive(false);
+        if (_canvas == null) return;
+        _canvas.SetActive(false);
     }
 
     internal static void Hook()
