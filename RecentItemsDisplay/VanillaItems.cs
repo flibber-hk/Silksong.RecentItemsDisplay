@@ -16,8 +16,7 @@ namespace RecentItemsDisplay;
 
 internal static class VanillaItems
 {
-    // Separate method for forward-compatibility
-    private static void SendToDisplay(ISpriteProvider sprite, string text) => Display.AddItem(sprite.GetSprite(), text);
+    private static void SendToDisplay(ISpriteProvider sprite, string text) => MessageSerializationBridge.SendItemToDisplay(sprite, text);
 
     private static readonly MonoDetourManager mgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)}");
     private static readonly MonoDetourManager fsmMgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)} :: FSM");
@@ -281,9 +280,24 @@ internal static class VanillaItems
 
     private static void GetFakeCollectable(FakeCollectable self, ref bool showPopup)
     {
+        string text = self.GetUIMsgName();
+        if (text.StartsWith("!!") && text.EndsWith("!!"))
+        {
+            switch (self.name)
+            {
+                case "Heart Piece":
+                    text = Language.Get("INV_NAME_HEART_PIECE_1", "UI");
+                    break;
+                case "Silk Spool":
+                    text = Language.Get("INV_NAME_SPOOL_PIECE_HALF", "UI");
+                    break;
+
+            }
+        }
+
         SendToDisplay(
             new NonSerializableSprite() { RuntimeSprite = self.GetUIMsgSprite() },
-            self.GetUIMsgName());
+            text);
     }
 
     private static void OnBuyShopItem(ShopItem self, ref Action onComplete, ref int subItemIndex)

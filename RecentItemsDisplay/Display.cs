@@ -1,5 +1,7 @@
 ﻿using BepInEx.Logging;
 using MonoDetour.Reflection.Unspeakable;
+using RecentItemsDisplay.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TeamCherry.Localization;
@@ -16,8 +18,8 @@ internal static class Display
     private static readonly ManualLogSource Log = Logger.CreateLogSource($"{nameof(RecentItemsDisplay)}.{nameof(Display)}");
 
     // TODO - send items from save data
-    // TODO - make these configurable
-    public static int NumDisplayableItems { get; internal set; } = 5;
+    public static int NumDisplayableItems => ConfigSettings.NumDisplayableItems.Value;
+    public static bool DisplayEnabled => ConfigSettings.DisplayEnabled.Value;
     private static readonly Vector2 AnchorPoint = new(0.9f, 0.9f);
 
     public static int MaxItems { get; internal set; } = 10;
@@ -25,8 +27,8 @@ internal static class Display
     private static GameObject? _canvas;
     private static GameObject? _title;
     private static readonly Queue<GameObject> _items = new();
-    
 
+    internal static event Action? OnCreateDisplay;
 
     public static void Create()
     {
@@ -54,6 +56,8 @@ internal static class Display
 
         UpdateVisibility();
         Show();
+
+        OnCreateDisplay?.Invoke();
     }
 
     public static void Destroy()
@@ -71,6 +75,9 @@ internal static class Display
         UpdateVisibility();
     }
 
+    /// <summary>
+    /// Messages sent here should go via the <see cref="MessageSerializationBridge"/>
+    /// </summary>
     internal static void AddItem(Sprite? sprite, string msg, Color? textColor = null)
     {
         if (_canvas == null)
@@ -121,6 +128,9 @@ internal static class Display
     }
     private static void UpdateVisibility()
     {
+        if (_canvas == null) return;
+        _canvas.SetActive(DisplayEnabled);
+
         foreach ((GameObject item, int index) in _items.Reverse().Select((go, idx) => (go, idx)))
         {
             item.SetActive(index < NumDisplayableItems);
@@ -135,7 +145,7 @@ internal static class Display
     public static void Show()
     {
         if (_canvas == null) return;
-        _canvas.SetActive(true);
+        _canvas.SetActive(DisplayEnabled);
     }
 
     public static void Hide()
@@ -146,6 +156,8 @@ internal static class Display
 
     internal static void Hook()
     {
+        RecentItemsDisplayPlugin.Instance.Config.SettingChanged += OnConfigSettingChanged;
+
         Md.QuitToMenu.Start.PostfixMoveNext(DestroyOnQuitToMenu);
         Md.HeroController.Start.Postfix(CreateOnEnterGame);
 
@@ -154,6 +166,11 @@ internal static class Display
 
         // TODO: When a menu, inv pane, etc is showing, we want to ensure hidden
         // Otherwise ensure not hidden
+    }
+
+    private static void OnConfigSettingChanged(object sender, BepInEx.Configuration.SettingChangedEventArgs e)
+    {
+        Redraw();
     }
 
     private static void ShowOnUnpause(UIManager self)

@@ -1,4 +1,6 @@
 using BepInEx;
+using RecentItemsDisplay.Serialization;
+using UnityEngine;
 
 namespace RecentItemsDisplay;
 
@@ -15,8 +17,10 @@ public partial class RecentItemsDisplayPlugin : BaseUnityPlugin
     {
         Instance = this;
 
+        ConfigSettings.Init(Config);
         Display.Hook();
         VanillaItems.Hook();
+        MessageSerializationBridge.Hook();
 
         Logger.LogInfo($"Plugin {Name} ({Id}) has loaded!");
     }
