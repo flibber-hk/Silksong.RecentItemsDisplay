@@ -10,7 +10,8 @@ internal static class MessageSerializationBridge
 
     internal static void Hook()
     {
-        Display.OnCreateDisplay += LoadItemsFromSave;
+        // TODO - we can enable this when ItemData is properly associated with the save file
+        // Display.OnCreateDisplay += LoadItemsFromSave;
     }
 
     internal static void SendItemToDisplay(ISpriteProvider sprite, string message, Color? textColor = null)
