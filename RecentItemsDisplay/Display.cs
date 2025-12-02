@@ -22,7 +22,7 @@ internal static class Display
     public static bool DisplayEnabled => ConfigSettings.DisplayEnabled.Value;
     private static readonly Vector2 AnchorPoint = new(0.9f, 0.9f);
 
-    public static int MaxItems { get; internal set; } = 10;
+    public static int MaxItems { get; internal set; } = 15;
 
     private static GameObject? _canvas;
     private static GameObject? _title;
