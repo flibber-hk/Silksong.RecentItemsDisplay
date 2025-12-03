@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using MonoDetour.Reflection.Unspeakable;
+using RecentItemsDisplay.Localization;
 using RecentItemsDisplay.Serialization;
 using System;
 using System.Collections.Generic;
@@ -44,7 +45,7 @@ internal static class Display
 
         _title = CUtil.CreateTextPanel(
             _canvas,
-            Language.Get("RECENT_ITEMS_TITLE", $"Mods.{RecentItemsDisplayPlugin.Id}"),
+            LanguageKeys.RECENT_ITEMS_TITLE.LocalizeKey(),
             24,
             TextAnchor.MiddleCenter,
             new CanvasUtil.RectData(
