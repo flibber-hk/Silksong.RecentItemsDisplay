@@ -49,6 +49,10 @@
     <PackageReference Include="MonoDetour.HookGen" Version="0.7.*" PrivateAssets="all" />
     <PackageReference Include="MonoDetour" Version="*" />
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <MonoDetourHookGenStripUnusedHooks>true</MonoDetourHookGenStripUnusedHooks>
+  </PropertyGroup>
   
   <ItemGroup>
     <None Include="../README.md" Pack="True" PackagePath="README.md" />

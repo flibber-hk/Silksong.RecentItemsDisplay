@@ -49,18 +49,17 @@
       "MonoDetour": {
         "type": "Direct",
         "requested": "[*, )",
-        "resolved": "0.7.5",
-        "contentHash": "jbEm9x1VJVWurAKTiA8z7Ugb+N5ktH0jgvoIguVvn7tWwZ2COkfURN5ZaIM0bUG8Ze0S5OEIKXl5/bs5sYJj8g==",
+        "resolved": "0.7.6",
+        "contentHash": "JOC8dgI/IbQn5BS90FnRO4QA4jjWxoudYex9W9qL+4lA5TCya0qC+IC18KbkGAAlCg1nISMKnZrBjv6zFW2ivg==",
         "dependencies": {
-          "Mono.Cecil": "0.11.5",
           "MonoMod.RuntimeDetour": "21.12.13.1"
         }
       },
       "MonoDetour.HookGen": {
         "type": "Direct",
         "requested": "[0.7.*, )",
-        "resolved": "0.7.3",
-        "contentHash": "82nNksQf2HHpoTt0QhWY+uWCkA9gYE4H+7fbBI2IOa+TVe4In838/XogX/5Lx6EhXXF58qV4XWvwFxmmdg/YQw==",
+        "resolved": "0.7.6",
+        "contentHash": "LVaOXo0eBk1LbR9gfrEd7e2YfB8ha5LgEzGOvq8XVtEyGZpNMABkd6LmROFWaqRZ3YL7HS+PNCKTds41fW5F8w==",
         "dependencies": {
           "MonoDetour": "0.5.0"
         }
@@ -133,8 +132,8 @@
       },
       "Mono.Cecil": {
         "type": "Transitive",
-        "resolved": "0.11.5",
-        "contentHash": "fxfX+0JGTZ8YQeu1MYjbBiK2CYTSzDyEeIixt+yqKKTn7FW8rv7JMY70qevup4ZJfD7Kk/VG/jDzQQTpfch87g=="
+        "resolved": "0.11.4",
+        "contentHash": "IC1h5g0NeJGHIUgzM1P82ld57knhP0IcQfrYITDPXlNpMYGUrsG5TxuaWTjaeqDNQMBDNZkB8L0rBnwsY6JHuQ=="
       },
       "MonoMod.RuntimeDetour": {
         "type": "Transitive",
