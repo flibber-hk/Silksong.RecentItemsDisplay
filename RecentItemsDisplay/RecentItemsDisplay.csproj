@@ -50,7 +50,7 @@
     <PackageReference Include="MonoDetour" Version="*" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+  <PropertyGroup Condition="'$(CI)' == 'true'">
     <MonoDetourHookGenStripUnusedHooks>true</MonoDetourHookGenStripUnusedHooks>
   </PropertyGroup>
   
