@@ -17,7 +17,7 @@ internal static class ConfigSettings
             "General", "NumDisplayableItems", 5,
             new ConfigDescription(
                 "The max number of recent items to display",
-                new AcceptableValueRange<int>(1, 10)
+                new AcceptableValueRange<int>(1, Display.MaxItems)
                 // MenuElementGenerators.CreateIntSliderGenerator()
             )
         );

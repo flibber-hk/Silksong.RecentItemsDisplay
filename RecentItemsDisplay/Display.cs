@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using MonoDetour.Reflection.Unspeakable;
+using RecentItemsDisplay.Localization;
 using RecentItemsDisplay.Serialization;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ internal static class Display
     public static bool DisplayEnabled => ConfigSettings.DisplayEnabled.Value;
     private static readonly Vector2 AnchorPoint = new(0.9f, 0.9f);
 
-    public static int MaxItems { get; internal set; } = 10;
+    public static int MaxItems { get; internal set; } = 15;
 
     private static GameObject? _canvas;
     private static GameObject? _title;
@@ -44,7 +45,7 @@ internal static class Display
 
         _title = CUtil.CreateTextPanel(
             _canvas,
-            Language.Get("RECENT_ITEMS_TITLE", $"Mods.{RecentItemsDisplayPlugin.Id}"),
+            LanguageKeys.RECENT_ITEMS_TITLE.LocalizeKey(),
             24,
             TextAnchor.MiddleCenter,
             new CanvasUtil.RectData(
