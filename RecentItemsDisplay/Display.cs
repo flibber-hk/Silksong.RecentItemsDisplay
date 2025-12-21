@@ -5,7 +5,6 @@ using RecentItemsDisplay.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TeamCherry.Localization;
 using UnityEngine;
 using UnityEngine.UI;
 using CUtil = CanvasUtil.CanvasUtil;
@@ -18,7 +17,6 @@ internal static class Display
 {
     private static readonly ManualLogSource Log = Logger.CreateLogSource($"{nameof(RecentItemsDisplay)}.{nameof(Display)}");
 
-    // TODO - send items from save data
     public static int NumDisplayableItems => ConfigSettings.NumDisplayableItems.Value;
     public static bool DisplayEnabled => ConfigSettings.DisplayEnabled.Value;
     private static readonly Vector2 AnchorPoint = new(0.9f, 0.9f);

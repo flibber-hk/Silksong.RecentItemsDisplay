@@ -1,4 +1,5 @@
 ﻿using BepInEx.Configuration;
+using Silksong.ModMenu.Plugin;
 
 namespace RecentItemsDisplay.Serialization;
 
@@ -17,8 +18,8 @@ internal static class ConfigSettings
             "General", "NumDisplayableItems", 5,
             new ConfigDescription(
                 "The max number of recent items to display",
-                new AcceptableValueRange<int>(1, Display.MaxItems)
-                // MenuElementGenerators.CreateIntSliderGenerator()
+                new AcceptableValueRange<int>(1, Display.MaxItems),
+                MenuElementGenerators.CreateIntSliderGenerator()
             )
         );
     }
