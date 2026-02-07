@@ -75,7 +75,7 @@ internal static class Display
     }
 
     /// <summary>
-    /// Messages sent here should go via the <see cref="MessageSerializationBridge"/>
+    /// Messages sent here should go via the <see cref="VanillaItemSerializationPath"/>
     /// </summary>
     internal static void AddItem(Sprite? sprite, string msg, Color? textColor = null)
     {

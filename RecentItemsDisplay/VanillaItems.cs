@@ -16,7 +16,7 @@ namespace RecentItemsDisplay;
 
 internal static class VanillaItems
 {
-    private static void SendToDisplay(ISpriteProvider sprite, string text) => MessageSerializationBridge.SendItemToDisplay(sprite, text);
+    private static void SendToDisplay(ISpriteProvider sprite, string text) => VanillaItemSerializationPath.SendItemToDisplay(sprite, text);
 
     private static readonly MonoDetourManager mgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)}");
     private static readonly MonoDetourManager fsmMgr = new($"{RecentItemsDisplayPlugin.Id} :: {nameof(VanillaItems)} :: FSM");

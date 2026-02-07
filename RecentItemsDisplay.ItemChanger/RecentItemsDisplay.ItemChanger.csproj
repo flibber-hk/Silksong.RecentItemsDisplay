@@ -9,8 +9,8 @@
     This is the name of your plugin as it would appear in-game and in a mod installer. 
     Allowed characters are A-Z, a-z, 0-9 and _ 
     -->
-    <AssemblyTitle>RecentItemsDisplay</AssemblyTitle>
-
+    <AssemblyTitle>RecentItemsDisplay.ItemChanger</AssemblyTitle>
+    
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -20,82 +20,59 @@
     <NoWarn>$(NoWarn);MSB3270</NoWarn>
 
     <RestorePackagesWithLockFile>True</RestorePackagesWithLockFile>
-    <!-- CI environment variable is automatically set by GitHub actions -->
     <RestoreLockedMode Condition="'$(CI)' == 'true'">True</RestoreLockedMode>
 
-    <!-- Allow access of private members at runtime -->
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- Shortens and anonymizes paths in debug symbols relative to the project directory. Breakpoints will not work, however. -->
     <PathMap Condition="'$(Configuration)' == 'Release'">$(MSBuildProjectDirectory)=/</PathMap>
 
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageId>Silksong.RecentItemsDisplay</PackageId>
-    <RepositoryUrl>https://github.com/flibber-hk/Silksong.RecentItemsDisplay</RepositoryUrl>
+    <RepositoryUrl>https://github.com/flibber-hk/RecentItemsDisplay.ItemChanger</RepositoryUrl>
   </PropertyGroup>
-  
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.21" />
     <PackageReference Include="HarmonyX" Version="2.9.0" />
-    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.1.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Unity.Analyzers" Version="1.26.0" PrivateAssets="all" />
-    <PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile" />
-    <PackageReference Include="Silksong.GameLibs" Version="*-*" PrivateAssets="all" />
+    <PackageReference Include="Harmonize" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Unity.Analyzers" Version="1.25.0" PrivateAssets="all" />
     <PackageReference Include="PolySharp" Version="1.15.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="UnityEngine.Modules" Version="6000.0.50" IncludeAssets="compile" />
+    <PackageReference Include="Silksong.GameLibs" Version="*-*" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Silksong.CanvasUtil" Version="1.0.0" />
-    <PackageReference Include="Silksong.FsmUtil" Version="0.3.12" />
-    <PackageReference Include="Silksong.UnityHelper" Version="1.1.1" />
-    <PackageReference Include="Silksong.ModMenu" Version="0.2.0" />
-    <PackageReference Include="Silksong.DataManager" Version="1.1.0" />
-    <PackageReference Include="MonoDetour.HookGen" Version="0.7.*" PrivateAssets="all" />
-    <PackageReference Include="MonoDetour" Version="*" />
+    <PackageReference Include="ItemChanger.Core" Version="0.4.2" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(CI)' == 'true'">
-    <MonoDetourHookGenStripUnusedHooks>true</MonoDetourHookGenStripUnusedHooks>
-  </PropertyGroup>
   
   <ItemGroup>
-    <None Include="../README.md" Pack="True" PackagePath="README.md" />
-    <None Include="../thunderstore/icon.png" Pack="True" PackagePath="icon.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="DataDrivenConstants" Version="1.1.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <AdditionalFiles Include="languages/en.json"/>
+    <ProjectReference Include="..\RecentItemsDisplay\RecentItemsDisplay.csproj" />
   </ItemGroup>
 
   <Target Name="CopyAndPackageMod" AfterTargets="PostBuildEvent">
     <ItemGroup>
       <Binaries Include="$(TargetPath)" LocalDir="/" PackDir="/" />
       <Binaries Include="$(TargetDir)/$(TargetName).pdb" LocalDir="/" PackDir="/" />
-      <Binaries Include="languages/*.json" LocalDir="languages" PackDir="plugins/languages" />
     </ItemGroup>
     <PropertyGroup>
       <ThunderstoreDir>$(ProjectDir)/../thunderstore</ThunderstoreDir>
     </PropertyGroup>
 
     <!-- Local install -->
-    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(SilksongPluginsFolder)/flibber-$(AssemblyTitle)/%(Binaries.LocalDir)" Condition="'$(SilksongPluginsFolder)' != '' And Exists('$(SilksongPluginsFolder)')" />
+    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(SilksongPluginsFolder)/flibber-RecentItemsDisplay/%(Binaries.LocalDir)" Condition="'$(SilksongPluginsFolder)' != '' And Exists('$(SilksongPluginsFolder)')" />
 
     <!-- Thunderstore packaging -->
+    <!--
+    No need to clear out thunderstore folders because they're cleared out by the other csproj
     <RemoveDir Directories="$(ThunderstoreDir)/temp;$(ThunderstoreDir)/dist" />
     <MakeDir Directories="$(ThunderstoreDir)/temp" />
-    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(ThunderstoreDir)/temp/%(Binaries.PackDir)" />
-    <!--
-    Suppress thunderstore package creation as we'll do it in the other plugin
-    <Exec Command="dotnet tool restore" />
-    <Exec Command="dotnet tcli build MMconfig-path &quot;$(ThunderstoreDir)/thunderstore.toml&quot; MMpackage-name &quot;$(AssemblyTitle)&quot; MMpackage-version $(Version)" StandardOutputImportance="High" StandardErrorImportance="High" />
     -->
+    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(ThunderstoreDir)/temp/%(Binaries.PackDir)" />
+    <Exec Command="dotnet tool restore" />
+    <Exec Command="dotnet tcli build --config-path &quot;$(ThunderstoreDir)/thunderstore.toml&quot; --package-name &quot;RecentItemsDisplay&quot; --package-version $(Version)" StandardOutputImportance="High" StandardErrorImportance="High" />
   </Target>
 </Project>
+

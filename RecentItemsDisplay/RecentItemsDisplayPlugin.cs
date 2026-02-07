@@ -1,4 +1,5 @@
 using BepInEx;
+using BepInEx.Logging;
 using RecentItemsDisplay.Serialization;
 using Silksong.DataManager;
 
@@ -14,6 +15,8 @@ namespace RecentItemsDisplay;
 public partial class RecentItemsDisplayPlugin : BaseUnityPlugin, ISaveDataMod<SaveData>
 {
     public static RecentItemsDisplayPlugin Instance { get; private set; }
+    internal static ManualLogSource InstanceLogger { get; private set; }
+
     SaveData? ISaveDataMod<SaveData>.SaveData
     {
         get => SaveData.GetData();
@@ -26,11 +29,12 @@ public partial class RecentItemsDisplayPlugin : BaseUnityPlugin, ISaveDataMod<Sa
     private void Awake()
     {
         Instance = this;
+        InstanceLogger = this.Logger;
 
         ConfigSettings.Init(Config);
         Display.Hook();
         VanillaItems.Hook();
-        MessageSerializationBridge.Hook();
+        VanillaItemSerializationPath.Hook();
 
         Logger.LogInfo($"Plugin {Name} ({Id}) has loaded!");
     }
