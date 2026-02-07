@@ -45,6 +45,7 @@ internal static class VanillaItems
         Md.FakeCollectable.Get.Prefix(GetFakeCollectable, manager: mgr);
         // JournalQuestTarget - ???
         // QuestTarget* - ???
+        Md.QuestTargetPlayerDataBools.Get.Postfix(GetFlea, manager: mgr);
         // ToolItemBase has two direct subclasses
         Md.ToolItem.Unlock.Prefix(OnCollectToolItem, manager: mgr);
         Md.ToolCrest.Unlock.Prefix(OnCollectToolCrest, manager: mgr);
@@ -58,6 +59,14 @@ internal static class VanillaItems
 
         // Items which directly modify PlayerData via an FSM
         Md.PlayMakerFSM.Start.Prefix(WatchFsms, manager: fsmMgr);
+    }
+
+    private static void GetFlea(QuestTargetPlayerDataBools self, ref bool showPopup)
+    {
+        if (self.name != "FleasCollected Target") return;
+        if (!showPopup) return;
+
+        SendToDisplay(new NonSerializableSprite() { RuntimeSprite = self.GetPopupIcon() }, Language.Get("KEY_FLEA", "UI"));
     }
 
     private static bool NameMatches(this string self, string target)

@@ -19,3 +19,4 @@
 [assembly: MonoDetourTargets(typeof(PlayMakerFSM))]
 [assembly: MonoDetourTargets(typeof(PowerUpGetMsg))]
 [assembly: MonoDetourTargets(typeof(SkillGetMsg))]
+[assembly: MonoDetourTargets(typeof(QuestTargetPlayerDataBools))]
