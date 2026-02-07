@@ -64,6 +64,7 @@ internal static class VanillaItems
     private static void GetFlea(QuestTargetPlayerDataBools self, ref bool showPopup)
     {
         if (self.name != "FleasCollected Target") return;
+        // Fleas are given multiple times, but only once with showPopup as true
         if (!showPopup) return;
 
         SendToDisplay(new NonSerializableSprite() { RuntimeSprite = self.GetPopupIcon() }, Language.Get("KEY_FLEA", "UI"));
