@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ItemChanger.Core" Version="0.4.2" />
+    <PackageReference Include="ItemChanger.Core" Version="0.5.3" />
   </ItemGroup>
   
   <ItemGroup>

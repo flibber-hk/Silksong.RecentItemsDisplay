@@ -11,12 +11,12 @@ public static class RecentItemsDisplayAPI
         VanillaItemSerializationPath.ShouldSuppressVanillaItems += shouldSuppress;
     }
 
-    public static void SendMessageToDisplay(Sprite sprite, string message)
+    public static void SendMessageToDisplay(Sprite? sprite, string message)
     {
         SendMessageToDisplay(sprite, message, null);
     }
 
-    public static void SendMessageToDisplay(Sprite sprite, string message, Color? color)
+    public static void SendMessageToDisplay(Sprite? sprite, string message, Color? color)
     {
         Display.AddItem(sprite, message, color);
     }

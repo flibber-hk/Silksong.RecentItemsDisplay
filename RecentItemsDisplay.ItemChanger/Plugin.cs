@@ -1,6 +1,5 @@
 using BepInEx;
 using ItemChanger;
-using ItemChanger.Items;
 
 namespace RecentItemsDisplay.ItemChanger
 {
@@ -12,16 +11,7 @@ namespace RecentItemsDisplay.ItemChanger
         private void Awake()
         {
             RecentItemsDisplayAPI.AddVanillaItemsSuppression(() => ItemChangerHost.Singleton.ActiveProfile != null);
-            Item.AfterGiveGlobal += args =>
-            {
-                if (args.Item.UIDef != null)
-                {
-                    RecentItemsDisplayAPI.SendMessageToDisplay(
-                        args.Item.UIDef.GetSprite(),
-                        args.Item.UIDef.GetPostviewName()
-                    );
-                }
-            };
+            ItemChangerHost.Singleton.LifecycleEvents.OnEnterGame += () => ItemChangerHost.Singleton.ActiveProfile!.Modules.GetOrAdd<RecentItemsModule>();
             Logger.LogInfo($"Plugin {Name} ({Id}) has loaded!");
         }
     }

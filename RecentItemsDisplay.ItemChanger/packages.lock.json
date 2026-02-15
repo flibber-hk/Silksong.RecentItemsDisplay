@@ -42,11 +42,10 @@
       },
       "ItemChanger.Core": {
         "type": "Direct",
-        "requested": "[0.4.2, )",
-        "resolved": "0.4.2",
-        "contentHash": "pXy3HkBibuZuC3nBke/ue7M9nDzBYccaK59ASjSPt4wXBWW9u8jROb58KWT/VvA9SqJBUsqdKPafqdCZo2K63Q==",
+        "requested": "[0.5.3, )",
+        "resolved": "0.5.3",
+        "contentHash": "GMAHFEAAjMiehylz6EWuJV/76ou31yaCvN+J2SvZKRn+a7GFKO0NDP8WWD+Pc8XMApHo41/9wS3hq2uRvePfhA==",
         "dependencies": {
-          "CSharpier.MsBuild": "1.1.2",
           "Newtonsoft.Json": "13.0.3"
         }
       },
@@ -78,11 +77,6 @@
         "type": "Transitive",
         "resolved": "5.4.20",
         "contentHash": "0bXgYxbCEN2Ixp3kiFEhyw+RASeFQeg/ww+lbMt7if6XMeVS60eg6epNsMA8Jbx57dmNOzNevkKKw8mP8SUMqw=="
-      },
-      "CSharpier.MsBuild": {
-        "type": "Transitive",
-        "resolved": "1.1.2",
-        "contentHash": "Ed3Z3g0j6ZbGfd7Mo2qjc7asQI5zwLu4u/2KfqPYABCuPajUXjC+2O5iOBdrdjrhDM5pIwRqwmjD7DTQi78hLQ=="
       },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
