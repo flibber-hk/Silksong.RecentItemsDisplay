@@ -42,7 +42,7 @@ jobs:
     - name: Build
       run: dotnet build -c Release --verbosity normal
     - name: Pack
-      run: dotnet pack -o nuget/
+      run: dotnet pack -o nuget/ --no-build -c Release
     - name: Get Version
       id: version
       run: |-
