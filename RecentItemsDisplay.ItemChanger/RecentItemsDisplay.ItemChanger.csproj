@@ -28,6 +28,11 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/flibber-hk/RecentItemsDisplay.ItemChanger</RepositoryUrl>
+    <!--
+    Disable packing for RecentItemsDisplay.ItemChanger for now; I'd prefer to keep the API
+    available only via the tags.
+    -->
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.0.8" PrivateAssets="all" />
