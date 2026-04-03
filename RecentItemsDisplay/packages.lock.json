@@ -106,27 +106,27 @@
       "Silksong.GameLibs": {
         "type": "Direct",
         "requested": "[*-*, )",
-        "resolved": "1.2.0-silksong1.0.29315",
-        "contentHash": "MwcUC0FMUn7aCwYHWgQegOBxNGgNBDie9nfg0GeodqbnfrHOjUZ06sZjq+0Iiz9/WBL8yd511YZujFS91FgVMw=="
+        "resolved": "1.2.0-silksong1.0.30000",
+        "contentHash": "2JPRsmFO5dBwLeIHA3kLlEYtu4BQ0Swdp3E4+J35IQGEujW3npMPot83BvY9wd3N7/Ycy2IfWilWC7fx6Sa3bg=="
       },
       "Silksong.ModMenu": {
         "type": "Direct",
-        "requested": "[0.4.4, )",
-        "resolved": "0.4.4",
-        "contentHash": "VrXaB1K4FCaNfvMlIDlj/cPaSNrD6hIrGKq19FtwTRkGzlkY4TmRhvVtwJkP7csPveDy207y6ODX9iTjox9x4w==",
+        "requested": "[0.4.6, )",
+        "resolved": "0.4.6",
+        "contentHash": "lHGWE3r7WqyIUN5Dy6PAlY5cuxG/znUM+ieTfXbNLtbYVFQUSbaasITLWYWglTZbvhkHn8ybpZjhNDPt4tjing==",
         "dependencies": {
           "BepInEx.Core": "5.4.21",
           "HarmonyX": "2.9.0",
           "MonoDetour": "0.7.13",
-          "Silksong.UnityHelper": "1.1.1",
+          "Silksong.UnityHelper": "1.2.0",
           "UnityEngine.Modules": "6000.0.50"
         }
       },
       "Silksong.UnityHelper": {
         "type": "Direct",
-        "requested": "[1.1.1, )",
-        "resolved": "1.1.1",
-        "contentHash": "+tmyQabhgk+b5DTpOc0umVBTLmNvP6DzqiAvpgG7IlYttq3uD64Iq64AK2SXQnmXi/AlbmNmhPtXNjTzDmrfzg==",
+        "requested": "[1.2.0, )",
+        "resolved": "1.2.0",
+        "contentHash": "qneRu5HQnYPM9o4u3G09Ir4Xj2yIwIz80OREZqBko9WFVTvZcu+wKiFzGS3PoNbN8gGJIAW42s/3HPO+nQhCzQ==",
         "dependencies": {
           "BepInEx.Core": "5.4.21",
           "HarmonyX": "2.9.0",
