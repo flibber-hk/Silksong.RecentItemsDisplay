@@ -111,14 +111,14 @@
       },
       "Silksong.ModMenu": {
         "type": "Direct",
-        "requested": "[0.4.4, )",
-        "resolved": "0.4.4",
-        "contentHash": "VrXaB1K4FCaNfvMlIDlj/cPaSNrD6hIrGKq19FtwTRkGzlkY4TmRhvVtwJkP7csPveDy207y6ODX9iTjox9x4w==",
+        "requested": "[0.5.0, )",
+        "resolved": "0.5.0",
+        "contentHash": "t7Of10Nsv1GVmx1sEMLM8+8WQ1/GElfDqKGEZ8DWL50mw1oqf6ktPiuwBNUzwq5Bvav9TWYMcVtm2lAKNB0+NQ==",
         "dependencies": {
           "BepInEx.Core": "5.4.21",
           "HarmonyX": "2.9.0",
           "MonoDetour": "0.7.13",
-          "Silksong.UnityHelper": "1.1.1",
+          "Silksong.UnityHelper": "1.2.0",
           "UnityEngine.Modules": "6000.0.50"
         }
       },
