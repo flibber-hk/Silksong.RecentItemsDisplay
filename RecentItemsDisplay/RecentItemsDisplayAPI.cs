@@ -20,4 +20,15 @@ public static class RecentItemsDisplayAPI
     {
         Display.AddItem(sprite, message, color);
     }
+
+    public static void RefreshDisplay()
+    {
+        Display.Redraw();
+    }
+
+    public static event Action OnCreateDisplay
+    {
+        add => Display.OnCreateDisplay += value;
+        remove => Display.OnCreateDisplay -= value;
+    }
 }

@@ -19,14 +19,16 @@ public class RecentItemsModule : Module
 
     protected override void DoLoad()
     {
-        ItemChangerHost.Singleton.LifecycleEvents.OnSafeToGiveItems += SendAll;
+        ItemChangerHost.Singleton.LifecycleEvents.OnSafeToGiveItems += RecentItemsDisplayAPI.RefreshDisplay;
         Item.AfterGiveGlobal += OnGiveItem;
+        RecentItemsDisplayAPI.OnCreateDisplay += SendAll;
     }
 
     protected override void DoUnload()
     {
-        ItemChangerHost.Singleton.LifecycleEvents.OnSafeToGiveItems -= SendAll;
+        ItemChangerHost.Singleton.LifecycleEvents.OnSafeToGiveItems -= RecentItemsDisplayAPI.RefreshDisplay;
         Item.AfterGiveGlobal -= OnGiveItem;
+        RecentItemsDisplayAPI.OnCreateDisplay -= SendAll;
     }
 
     private void OnGiveItem(ReadOnlyGiveEventArgs args)

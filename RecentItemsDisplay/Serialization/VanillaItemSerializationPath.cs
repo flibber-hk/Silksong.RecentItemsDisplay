@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RecentItemsDisplay.Serialization;
@@ -11,7 +12,7 @@ internal static class VanillaItemSerializationPath
     private static bool ShouldSuppress()
     {
         if (ShouldSuppressVanillaItems == null) return false;
-        foreach (Func<bool> toInvoke in ShouldSuppressVanillaItems.GetInvocationList())
+        foreach (Func<bool> toInvoke in ShouldSuppressVanillaItems.GetInvocationList().Cast<Func<bool>>())
         {
             if (toInvoke == null) continue;
             bool b;
