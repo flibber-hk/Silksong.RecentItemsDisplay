@@ -50,10 +50,10 @@
 
   <ItemGroup>
     <PackageReference Include="Silksong.CanvasUtil" Version="1.0.0" />
-    <PackageReference Include="Silksong.FsmUtil" Version="0.3.12" />
-    <PackageReference Include="Silksong.UnityHelper" Version="1.1.1" />
-    <PackageReference Include="Silksong.ModMenu" Version="0.2.0" />
-    <PackageReference Include="Silksong.DataManager" Version="1.1.0" />
+    <PackageReference Include="Silksong.FsmUtil" Version="0.3.16" />
+    <PackageReference Include="Silksong.UnityHelper" Version="1.2.0" />
+    <PackageReference Include="Silksong.ModMenu" Version="0.5.2" />
+    <PackageReference Include="Silksong.DataManager" Version="1.2.2" />
     <PackageReference Include="MonoDetour.HookGen" Version="0.7.*" PrivateAssets="all" />
     <PackageReference Include="MonoDetour" Version="*" />
   </ItemGroup>
@@ -68,7 +68,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DataDrivenConstants" Version="1.1.0">
+    <PackageReference Include="DataDrivenConstants" Version="1.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
