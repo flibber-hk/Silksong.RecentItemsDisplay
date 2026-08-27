@@ -49,8 +49,8 @@
       "MonoDetour": {
         "type": "Direct",
         "requested": "[*, )",
-        "resolved": "0.7.13",
-        "contentHash": "A1v0WMKfTbRv3O1l6Myel56AGWfC1SRaXvkXqhLgHL31sttxwMww/ncJS9jpsclqs4hPx8zqcM29AkrqM8WDAg==",
+        "resolved": "0.7.15",
+        "contentHash": "7Ges3MvU0KbFb6kiV/v4EQTGEDcENlYAJlxzaUWCrenJwIBFy65Ebr4yj4AdbASQfMt6zailCAbBSdeXphmmaA==",
         "dependencies": {
           "MonoMod.RuntimeDetour": "21.12.13.1"
         }
@@ -58,8 +58,8 @@
       "MonoDetour.HookGen": {
         "type": "Direct",
         "requested": "[0.7.*, )",
-        "resolved": "0.7.13",
-        "contentHash": "HqlAZ6wiGAPIfnnhHsA8f7O/dKGmEbYPo8EDAD12XhTz/FOYv5qJAzV12SeGnWPbCygAEFMe7LDuiDLg1o4yeA==",
+        "resolved": "0.7.14",
+        "contentHash": "hPSbsYPJMQ+NueiNvLnbtJedOPhPJFY2mBrRR2WhIp79wbfugCDIjLrO5fzBgLrbJ7pHrXAcMn/FiyaEX65/VA==",
         "dependencies": {
           "MonoDetour": "0.5.0"
         }
@@ -94,9 +94,9 @@
       },
       "Silksong.FsmUtil": {
         "type": "Direct",
-        "requested": "[0.3.16, )",
-        "resolved": "0.3.16",
-        "contentHash": "womtQzOnW1UOHrqc+QSWANoJ5X55M7FmpLq8k9parVoOzpYikAOyf7d1Z5jmA/B1SVnk9HeUnQ3qzOhPjkFHLQ==",
+        "requested": "[0.3.17, )",
+        "resolved": "0.3.17",
+        "contentHash": "HECDgw7bkEyZS1rK5EtW9ZA4i2xBQZnBmnAzwHS9C2s/yxJpkCtgo71UMyhgQtJW5XFX5msBS9AgiHgzMEf5RA==",
         "dependencies": {
           "BepInEx.Core": "5.4.21",
           "HarmonyX": "2.9.0",
