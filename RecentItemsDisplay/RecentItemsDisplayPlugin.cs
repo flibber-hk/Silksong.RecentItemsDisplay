@@ -26,12 +26,14 @@ public partial class RecentItemsDisplayPlugin : BaseUnityPlugin, ISaveDataMod<Sa
     private void Awake()
     {
         Instance = this;
-
         ConfigSettings.Init(Config);
         Display.Hook();
+        Logger.LogInfo($"Plugin {Name} ({Id}) has loaded!");
+    }
+
+    private void Start()
+    {
         VanillaItems.Hook();
         MessageSerializationBridge.Hook();
-
-        Logger.LogInfo($"Plugin {Name} ({Id}) has loaded!");
     }
 }
